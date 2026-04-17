@@ -1,0 +1,74 @@
+/*
+Problem Statement
+Using DFS or BFS, count number of connected components.
+
+Input Format
+n m
+edges
+
+Output Format
+Number of connected components.
+
+Sample Input
+6 3
+1 2
+2 3
+5 6
+
+Sample Output
+3
+
+Explanation
+Components: {1,2,3}, {4}, {5,6}
+*/
+#include<stdio.h>
+#include<stdlib.h>
+
+struct Node {
+    int vertex;
+    struct Node* next;
+};
+struct Node* createNode(int v){
+    struct Node* newNode=(struct Node*)malloc(sizeof(struct Node));
+    newNode->vertex=v; newNode->next=NULL;
+    return newNode;
+}
+void addEdge(struct Node* adj[],int u,int v){
+    struct Node* newNode=createNode(v);
+    newNode->next=adj[u]; adj[u]=newNode;
+    newNode=createNode(u);
+    newNode->next=adj[v]; adj[v]=newNode;
+}
+void DFS(struct Node* adj[],int visited[],int v){
+    visited[v]=1;
+    struct Node* temp=adj[v];
+    while(temp){
+        if(!visited[temp->vertex]) DFS(adj,visited,temp->vertex);
+        temp=temp->next;
+    }
+}
+int countComponents(struct Node* adj[],int n){
+    int visited[n+1];
+    for(int i=1;i<=n;i++) visited[i]=0;
+    int count=0;
+    for(int i=1;i<=n;i++){
+        if(!visited[i]){
+            DFS(adj,visited,i);
+            count++;
+        }
+    }
+    return count;
+}
+int main(){
+    int n,m;
+    scanf("%d%d",&n,&m);
+    struct Node* adj[n+1];
+    for(int i=1;i<=n;i++) adj[i]=NULL;
+    for(int i=0;i<m;i++){
+        int u,v;
+        scanf("%d%d",&u,&v);
+        addEdge(adj,u,v);
+    }
+    printf("%d\n",countComponents(adj,n));
+    return 0;
+}
